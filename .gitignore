@@ -1,3 +1,11 @@
+*.zip
+*.pt
+*.pth
+*/wandb
+wandb
+sec_4.1_using_custom_models/*.json
+sec_4.1_using_custom_models/*/*.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
