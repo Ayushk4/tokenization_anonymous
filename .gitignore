@@ -4,8 +4,12 @@
 */wandb
 
 wandb
-sec_4.1_*custom_models/*.json
-sec_4.1_*custom_models/*/*.json
+sec_4.1_*/*.json
+sec_4.1_*/*/*.json
+sec_4.1_*/control
+sec_4.1_*/pred
+sec_4.1_*/preds
+sec_4.1_*/savefolder
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
