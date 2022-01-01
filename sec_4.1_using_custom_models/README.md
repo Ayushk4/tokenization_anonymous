@@ -26,4 +26,6 @@ If you are using `cpu`, set also include `--device=cpu`.
 
 It takes about 5-10 minutes to compute the POS+NER label distribution over the entire vocab of GPT-J. Do not end the pos_path or ner_path with a '/'.
 
+Once the POS+NER label for any model-pair is cached, it takes less than 5 minutes per run.
 
+It is recommended to clear cache each time you change the `--pos_path` and `--ner_path` arguments. As it may use the previous models' cache instead of the new one.
