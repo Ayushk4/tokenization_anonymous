@@ -17,7 +17,7 @@
 1. Make sure the folders for the 6 models are in their respective folder - `bert_token`, `bert_sentence`, `gpt6b_model` in `pos_models/` and `ner_bert_token`, `ner_bert_sentence`, `ner_gptj` in `ner_models/`
 1. Download [GPT-J's Embeddings](https://github.com/Anonymous-ARR/Releases/releases/download/gptj/gpt-j-6B.Embedding.pth) into the current folder.
 
-You may train the model using NER and PoS from these custom pretrained models using - `python3 train.py --pos --pos_path <PATH_TO_POS_MODEL> --ner --ner_path <PATH_TO_NER_MODEL> --batch <BATCH_SIZE> --wandb --lr=<LEARNING_RATE> --seed=<SEED>`
+You may train the model using NER and PoS from these custom pretrained models using - `python3 train.py --pos --pos_path <PATH_TO_POS_MODEL> --ner --ner_path <PATH_TO_NER_MODEL> --batch <BATCH_SIZE> --wandb --lr=<LEARNING_RATE> --seed=<SEED>`. The Wandb command is optional and using it will allow you to use WANDB for logging.
 
 For example for the gptj model you can use:
 `python3 train.py --pos --pos_path pos_models/gpt6b_model --ner --ner_path ner_models/ner_gptj --batch 64 --wandb --lr=1e-4 --seed=2714`
