@@ -17,6 +17,7 @@ parser.add_argument("--task_level", type=str, required="true",
                         help="Model type to train.")
 
 parser.add_argument("--weight_path", type=str, required=True)
+parser.add_argument("--target_names", type=str, required=True)
 
 params = parser.parse_args()
 

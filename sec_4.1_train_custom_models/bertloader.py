@@ -25,9 +25,9 @@ class DatasetClass:
             self.test_data = self.read_data(DATA_PATH + "test.txt")
             json.dump([self.train_data, self.test_data], open("cache"+params.task+".json", "w+"))
 
-        self.target_names = {k:i for i, k in enumerate(set(
-                    [xx[1][0] for x in self.train_data for xx in x]))}
-
+        self.target_names = {k:i for i, k in enumerate(sorted(list(set(
+                    [xx[1][0] for x in self.train_data for xx in x]))))}
+        print(self.target_names)
 
         if params.dummy_run == True:
             self.train_dataset = self.batched_dataset([self.train_data[0]] * 2)
