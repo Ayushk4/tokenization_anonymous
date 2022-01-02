@@ -38,3 +38,31 @@ The CONLL 2003 formatted dataset was obtained from https://github.com/davidsbati
 
 ## Results:
 
+| Model Type | Num Epochs | Batch Size | Learning Rate | Dev F1-Wtd | Dev F1-Macro | Test F1-Wtd | Test F1-Macro |
+| ------------------- | -- | -- | ---- | ----- | ----- | ----- | ----- |
+| Bert-sentence (PoS) | 10 | 32 | 1e-5 | 98.17 | 94.80 | 93.42 | 87.40 |
+| Bert-token (PoS)    | 10 | 32 | 1e-5 | 76.42 | 56.75 | 77.24 | 56.74 |
+| GPT-J MLP (PoS)     | 20 | 64 | 1e-4 | 62.90 | 68.72 | 60.15 | 69.14 |
+| Bert-sentence (NER) | 10 | 32 | 1e-5 | 97.88 | 93.18 | 96.02 | 86.92 |
+| Bert-token (NER)    | 10 | 32 | 1e-5 | 83.50 | 56.97 | 81.57 | 54.88 |
+| GPT-J MLP (NER)     | 20 | 64 | 5e-5 | 85.59 | 63.56 | 82.71 | 57.34 |
+
+BERT-Sent: "ORG,O,MISC,LOC,PER"
+`python3 eval.py --task ner --bert=bert-base-cased --task_level=sentence --batch 64 --weight_path=<PATH_TO_WEIGHT> --target "ORG-O-MISC-LOC-PER"`
+
+BERT-Token: "LOC,PER,MISC,O,ORG"
+`python3 eval.py --task ner --bert=bert-base-cased --task_level=token --batch 64 --weight_path=<PATH_TO_WEIGHT> --target "LOC-PER-MISC-O-ORG"`
+
+GPTJ: "ORG,PER,LOC,MISC,O"
+`python3 eval.py --task ner --bert=bert-base-cased --task_level=token --batch 64 --weight_path=<PATH_TO_WEIGHT> --target "ORG-PER-LOC-MISC-O"`
+
+Bert-Sent-Pos:
+`python3 eval.py --task pos --bert=bert-base-cased --task_level=sentence --batch 64 --weight_path=<PATH_TO_WEIGHT> --target "(-,-CC-)-IN-\"-SYM-TO-VB-MD-\$-RP-JJS-''-PRP\$-NNS-NN-EX-NN|SYM-POS-RBS-PDT-RB-NNPS-CD-JJR-WP-JJ-VBG-UH-VBN-NNP-:-LS-DT-FW-VBP-WDT-WP\$-VBD-RBR-WRB-VBZ-.-PRP"`
+
+Bert-Token-Pos:
+`python3 eval.py --task pos --bert=bert-base-cased --task_level=token --batch 64 --weight_path=<PATH_TO_WEIGHT> --target ".-\"-WP-PRP\$-NN-WDT-''-CD-RB-VBZ-PDT-VBP-PRP-SYM-:-VBD-NNPS-JJ-WP\$-IN-RBS-JJS-EX-\$-,-TO-RBR-NN|SYM-LS-RP-JJR-VBG-(-MD-)-NNS-POS-CC-DT-VB-FW-VBN-UH-WRB-NNP"`
+
+GPTJ-PoS:
+`python3 eval.py --task pos --bert=EleutherAI/gpt-j-6B --task_level=token --batch 64 --weight_path=<PATH_TO_WEIGHT>   --target "EX-TO-POS-)-PDT-NN-PRP-PRP\$-WRB-WP\$-RBS-RP-VBG-(-SYM-LS-RB-MD-CD-.-FW-WDT-VB-VBZ-NN|SYM-UH-RBR-VBD-''-\$-NNP-,-\"-NNS-JJS-CC-WP-VBN-JJR-JJ-VBP-DT-NNPS-IN-:"`
+
+

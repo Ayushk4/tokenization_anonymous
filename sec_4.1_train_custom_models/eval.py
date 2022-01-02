@@ -76,7 +76,7 @@ class DatasetClass:
         self.valid_data = self.read_data(DATA_PATH + "valid.txt")
         self.test_data = self.read_data(DATA_PATH + "test.txt")
 
-        self.target_names = [x.strip() for x in params.target_names.split(",")]
+        self.target_names = {x.strip(): i for i, x in enumerate(params.target_names.split("-"))}
 
         print("Valid_dataset:", end= " ")
         self.valid_dataset = self.batched_dataset(self.valid_data)
@@ -180,7 +180,7 @@ class DatasetClass:
 dataset_object = DatasetClass()
 valid_dataset = dataset_object.valid_dataset
 test_dataset = dataset_object.test_dataset
-target_names = [x.strip() for x in params.target_names.split(",")]
+target_names = [x.strip() for x in params.target_names.split("-")]
 print(target_names)
 
 ############# Create model #############
