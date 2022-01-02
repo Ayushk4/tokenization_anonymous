@@ -9,7 +9,7 @@
 - [Wandb >= 0.12.2](https://docs.wandb.ai/quickstart#1.-set-up-wandb)
 - [SpaCy >= 3.x](https://spacy.io/usage)
 
-# Setting up
+## Setting up
 
 Install above dependencies, you may also install cudatoolkit if needed and SpaCy en web core, if needed.
 
@@ -26,3 +26,34 @@ It takes about 10 minutes to compute the SpaCy ner labels distribution over the 
 Once the POS+NER label for any model-pair is cached, it takes less than 5 minutes per run.
 
 It is recommended to clear cache each time you switch from SpaCy to control task or vice versa, as it may use the previous cache instead of creating new one.
+
+## Results
+
+Each time you run the experiment, all the results will be printed at the end of the run, and also on wandb if you include the flag.
+
+Averaged across 5 seeds/train-test splits
+
+| Measure | SpaCy | Control |
+| ------- | ----- | ------- |
+| F1 Aggr.| 52.34 | 49.68   |
+| ------- | ----- | ------- |
+| s       | 64.60 | 40.32   |
+| y       | 61.96 | 48.68   |
+| e       | 62.05 | 47.27   |
+| t       | 60.68 | 48.49   |
+| p       | 50.24 | 46.56   |
+| i       | 60.80 | 42.82   |
+| ------- | ----- | ------- |
+| w       | 45.75 | 48.69   |
+| q       | 43.79 | 49.28   |
+| k       | 47.79 | 46.24   |
+| o       | 52.94 | 43.59   |
+| b       | 48.92 | 48.25   |
+| m       | 48.13 | 46.11   |
+
+The exact command to get these are:
+`python3 train.py --pos --ner --tag --batch=128 --wandb --lr=1e-3`
+
+`python3 train.py --pos --ner --tag --batch=128 --wandb --lr=1e-2 --control`
+
+Run the above commands on multiple (5) seeds and average them.

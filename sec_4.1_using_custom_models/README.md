@@ -9,7 +9,7 @@
 - [Wandb >= 0.12.2](https://docs.wandb.ai/quickstart#1.-set-up-wandb)
 
 
-# Setting up
+## Setting up
 
 
 1. Install above dependencies, you may also install cudatoolkit if needed.
@@ -29,3 +29,36 @@ It takes about 5-10 minutes to compute the POS+NER label distribution over the e
 Once the POS+NER label for any model-pair is cached, it takes less than 5 minutes per run.
 
 It is recommended to clear cache each time you change the `--pos_path` and `--ner_path` arguments. As it may use the previous models' cache instead of the new one.
+
+## Results
+
+Each time you run the experiment, all the results will be printed at the end of the run, and also on wandb if you include the flag.
+
+Averaged across 5 seeds/train-test splits
+
+| Measure | Bert-Sent | Bert-Token | GPTJ |
+| ------- | --------- | ---------- | ---- |
+| F1 Aggr.|  55.00 | 59.75 | 61.24 |
+| ------- | ------ | ----- | ----- |
+| s       |  60.72 | 70.33 | 66.82 |
+| y       |  60.39 | 67.16 | 64.89 |
+| e       |  57.75 | 64.62 | 62.32 |
+| t       |  54.38 | 64.07 | 60.73 |
+| p       |  55.24 | 63.97 | 60.51 |
+| i       |  56.41 | 63.35 | 61.60 |
+| ------- | ------ | ----- | ----- |
+| w       |  52.72 | 57.69 | 58.27 |
+| q       |  56.53 | 57.54 | 53.54 |
+| k       |  49.38 | 57.31 | 55.96 |
+| o       |  53.61 | 56.83 | 55.63 |
+| b       |  56.74 | 56.39 | 55.13 |
+| m       |  53.40 | 56.28 | 55.61 |
+
+The exact command to get these are:
+`python3 train.py --pos --pos_path pos_models/bert_sentence --ner --ner_path ner_models/ner_bert_sentence --batch 64 --wandb --lr=1e-3`
+
+`python3 train.py --pos --pos_path pos_models/bert_token --ner --ner_path ner_models/ner_bert_token --batch 64 --wandb --lr=3e-3`
+
+`python3 train.py --pos --pos_path pos_models/gpt6b_model --ner --ner_path ner_models/ner_gptj --batch 64 --wandb --lr=1e-4`
+
+Run the above commands on multiple (5) seeds and average them.
