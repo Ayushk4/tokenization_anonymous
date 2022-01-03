@@ -3,6 +3,7 @@ import multiprocessing as mp
 from fuzzysearch import find_near_matches
 from transformers import AutoTokenizer
 from nltk.corpus import wordnet as wn
+from math import log
 from Levenshtein import distance as levenshtein_distance
 
 tok = AutoTokenizer.from_pretrained("EleutherAI/gpt-j-6B")
@@ -138,49 +139,76 @@ def single_word_qtfy(word):
             }
 
 def print_statishtics(number_list, word_list):
+    scale_occurrence_frequency = lambda x: min(16, max(12, round(log(x))))
+    word_occurrences_cnt = {k: sum([x[1] for x in occurences[k]]) for k in occurences}
+
     mean = lambda x : sum(x)/len(x)
     variance = lambda x: sum([(xx - mean(x))**2 for xx in x])/len(x)
     std = lambda x: variance(x) ** 0.5
-    round4 = lambda x: round(x, 4)
+    round4 = lambda x: round(x, 3)
 
     print("Max:", round4(max(number_list)))
     print("Min:", round4(min(number_list)))
     print("Mean:", round4(sum(number_list)/len(number_list)))
     # print("Variance:", round4(variance(number_list)))
     print("Std Dev.:", round4(std(number_list)))
-    
-    grouped = {x: ([], []) for x in set([len(w) for w in word_list])}
-    for num, wrd in zip(number_list, word_list):
-        grouped[len(wrd)][0].append(num)
-        grouped[len(wrd)][1].append(wrd)
 
-    print("Length Wise:")
+    for grp_by_len in [True, False]:
+        if grp_by_len:
+            grouped = {x: ([], []) for x in set([len(w) for w in word_list])}
+            for num, wrd in zip(number_list, word_list):
+                grouped[len(wrd)][0].append(num)
+                grouped[len(wrd)][1].append(wrd)
+            print("Length Wise:")
+        else:
+            grouped = {x: ([], []) for x in [12,13,14,15,16]}
+            for num, wrd in zip(number_list, word_list):
+                grouped[scale_occurrence_frequency(word_occurrences_cnt[wrd])][0].append(num)
+                grouped[scale_occurrence_frequency(word_occurrences_cnt[wrd])][1].append(wrd)
+            print("Occurrence Wise:")
 
-    print("\t", "Num Examples")
-    for w_len, grp in sorted(grouped.items(), key=lambda x: x[0]):
-        print("\t\t", f'{w_len}: {len(grp[1])}')
+        print("", "Num Examples")
+        print("  ", end="")
+        for w_len, grp in sorted(grouped.items(), key=lambda x: x[0]):
+            print(f'{w_len}: {len(grp[1])}', end=", ")
 
-    print("\t", "Example Words")
-    for w_len, grp in sorted(grouped.items(), key=lambda x: x[0]):
-        print("\t\t", f'{w_len}: {grp[1][:2]}')
+        print()
+        print("", "Example Words")
+        print("  ", end="")
+        for w_len, grp in sorted(grouped.items(), key=lambda x: x[0]):
+            print(f'{w_len}:{grp[1][0]}', end=",")
 
-    print("\t", "Mean")
-    for w_len, grp in sorted(grouped.items(), key=lambda x: x[0]):
-        print("\t\t", f'{w_len}: {round4(mean(grp[0]))}')
+        print()
+        print("", "Mean")
+        print("  ", end="")
+        for w_len, grp in sorted(grouped.items(), key=lambda x: x[0]):
+            print(f'{w_len}: {round4(mean(grp[0]))}', end=", ")
 
-    print("\t", "Std Dev.")
-    for w_len, grp in sorted(grouped.items(), key=lambda x: x[0]):
-        print("\t\t", f'{w_len}: {round4(std(grp[0]))}')
+        print()
+        print("", "Avg occurrences")
+        print("  ", end="")
+        for w_len, grp in sorted(grouped.items(), key=lambda x: x[0]):
+            print(f'{w_len}: {round(mean([word_occurrences_cnt[w] for w in grp[1]]))}', end=", ")
 
-    print("\t", "Max")
-    for w_len, grp in sorted(grouped.items(), key=lambda x: x[0]):
-        print("\t\t", f'{w_len}: {round4(max(grp[0]))}')
+        print()
+        print("", "Std Dev.")
+        print("  ", end="")
+        for w_len, grp in sorted(grouped.items(), key=lambda x: x[0]):
+            print(f'{w_len}: {round4(std(grp[0]))}', end=", ")
 
-    print("\t", "Min")
-    for w_len, grp in sorted(grouped.items(), key=lambda x: x[0]):
-        print("\t\t", f'{w_len}: {round4(min(grp[0]))}')
+        print()
+        print("", "Max")
+        print("  ", end="")
+        for w_len, grp in sorted(grouped.items(), key=lambda x: x[0]):
+            print(f'{w_len}: {round4(max(grp[0]))}', end=", ")
 
-    # print("List:", number_list)
+        print()
+        print("", "Min")
+        print("  ", end="")
+        for w_len, grp in sorted(grouped.items(), key=lambda x: x[0]):
+            print(f'{w_len}: {round4(min(grp[0]))}', end=", ")
+        print()
+        # print("List:", number_list)
 
 def main():
     target_words = list(occurences.keys())
