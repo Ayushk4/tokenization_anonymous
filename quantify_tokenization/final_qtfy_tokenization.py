@@ -120,9 +120,13 @@ def single_word_qtfy(word):
                         for single_string in occurences[word]
                         if word.strip().lower() in single_string[0].lower().strip()])
 
+    capitalization = set([tuple(tok.tokenize(single_string[0]))
+                        for single_string in occurences[word]
+                        if word.strip().lower() == single_string[0].lower()])
+
     print(word, len(unique_toks), len(removed_words),
             len(removed_within_1_dist_less), len(removed_within_1_dist_less_eq),
-            len(words_exact_contain),
+            len(words_exact_contain), len(capitalization),
             words_to_remove,
             [x for x in words_removed_1_dist_less if x not in words_removed_0_dist],
             [x for x in words_removed_1_dist_less_eq if x not in words_removed_0_dist and x not in words_removed_1_dist_less],
@@ -130,6 +134,7 @@ def single_word_qtfy(word):
 
     return {'all_unique_toks': list(unique_toks),
             'words_exact_contain': list(words_exact_contain),
+            'words_exact_case_insensitive': list(capitalization),
             '1_dist_words_in_wordnet': list(words_to_remove),
             'datapoint_less_eq_leven_dist_away_1_dist_words_in_wordnet': list(words_removed_1_dist_less),
             'datapoint_less_leven_dist_away_1_dist_words_in_wordnet': list(words_removed_1_dist_less_eq),
@@ -153,19 +158,31 @@ def print_statishtics(number_list, word_list):
     # print("Variance:", round4(variance(number_list)))
     print("Std Dev.:", round4(std(number_list)))
 
-    for grp_by_len in [True, False]:
-        if grp_by_len:
+    for grp_by_len in [1, 2, 3]:
+        if grp_by_len==1:
             grouped = {x: ([], []) for x in set([len(w) for w in word_list])}
             for num, wrd in zip(number_list, word_list):
                 grouped[len(wrd)][0].append(num)
                 grouped[len(wrd)][1].append(wrd)
             print("Length Wise:")
-        else:
+        elif grp_by_len==2:
             grouped = {x: ([], []) for x in [12,13,14,15,16]}
             for num, wrd in zip(number_list, word_list):
                 grouped[scale_occurrence_frequency(word_occurrences_cnt[wrd])][0].append(num)
                 grouped[scale_occurrence_frequency(word_occurrences_cnt[wrd])][1].append(wrd)
             print("Occurrence Wise:")
+        else:
+            grouped = {}#x: ([], []) for x in set([max(13, min(8, len(w))) for w in word_list])}
+            for num, wrd in zip(number_list, word_list):
+                if 14 < (log(word_occurrences_cnt[wrd])) < 14.5:
+                    if min(13, max(8, len(wrd))) in grouped:
+                        grouped[min(13, max(8, len(wrd)))][0].append(num)
+                        grouped[min(13, max(8, len(wrd)))][1].append(wrd)
+                    else:
+                        grouped[min(13, max(8, len(wrd)))] =[[num], [wrd]]
+
+            print("Occurrence-Most Wise:")
+
 
         print("", "Num Examples")
         print("  ", end="")
