@@ -142,7 +142,12 @@ class SpellingModel(nn.Module):
 
 # valid_loss, confuse_mat, classify_report = evaluate(model, eval_dataset, criterion, target_names)
 
-folder = 'control' if params.control else run_name
+try:
+    os.mkdir('savefolder')
+except:
+    pass
+
+folder = 'savefolder/control' if params.control else 'savefolder/'+run_name
 try:
     os.mkdir(folder)
 except:
