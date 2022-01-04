@@ -11,13 +11,15 @@ np.random.seed(params.seed)
 random.seed(params.seed)
 torch.manual_seed(params.seed)
 
-do_lowercase = True
-lowercase = lambda x: x.lower() if do_lowercase else x
+do_lowercase = lambda x: x.lower() if not params.case_insensitive else x
 MAX_LEN = 0
 
 basepath = "/".join(os.path.realpath(__file__).split('/')[:-1])
 
-regex_pattern = r'Ġ?[a-zA-Z]+$'
+if 'bert' not in params.model_card:
+    regex_pattern = r'Ġ?[a-zA-Z]+$'
+else:
+    regex_pattern = r'#*[a-zA-Z]+$'
 
 bert_tokenizer = AutoTokenizer.from_pretrained(params.model_card)
 full_dataset = sorted(bert_tokenizer.vocab.items(), key = lambda x: x[1])
@@ -25,12 +27,11 @@ full_dataset = sorted(bert_tokenizer.vocab.items(), key = lambda x: x[1])
 full_dataset = [x for x in full_dataset if re.match(regex_pattern, x[0]) and
                 len(x[0]) > 1 and set(x[0]) != {'Ġ'}]
 
-char_vocab = list(set([lowercase(x) for d in full_dataset for x in d[0]]))
+char_vocab = list(set([x.lower() for d in full_dataset for x in d[0]]))
 print(char_vocab)
 print("Len Char Vocab:", len(char_vocab))
 char_to_id = {c:i for i,c in enumerate(char_vocab)}
 id_to_char = {i:c for i,c in enumerate(char_vocab)}
-
 
 from nltk.stem import WordNetLemmatizer
 lemmatizer = WordNetLemmatizer()
@@ -87,7 +88,7 @@ class SpellingDataset:
         if params.dummy_run:
             all_data = all_data[:5]
         return [(x[0], self.bert_tokenizer.convert_tokens_to_ids(x[0]),
-                int(c in x[0]))
+                int(c in do_lowercase(x[0])))
             for x in all_data]
 
 def pad(batch):
