@@ -26,6 +26,8 @@ import wandb
 
 run_name = "ctrl" if params.control else params.model_card.split("/")[-1]
 run_name += "." + str(params.lr) + "." + str(params.batch_size) + "." + str(params.seed)
+if params.case_sensitive:
+    run_name += '.case_sense'
 if not params.dummy_run and params.wandb:
     wandb.init(project="expt1_char_qtfy", name=run_name)
     wandb.config.update(params)
@@ -112,7 +114,7 @@ class SpellingModel(nn.Module):
         if params.control or 'EleutherAI' in params.model_card:
             global trained_embeddings
             self.gptj_config = AutoConfig.from_pretrained('EleutherAI/gpt-j-6B')
-            assert self.gptj_config.vocab_size == trained_embeddings.shape[0], (self.gptj_config.vocab_size, trained_embeddings.shape)
+            # assert self.gptj_config.vocab_size == trained_embeddings.shape[0], (self.gptj_config.vocab_size, trained_embeddings.shape)
 
             self.frozen_embeddings = nn.Embedding.from_pretrained(trained_embeddings, freeze=True)
             print(self.frozen_embeddings.weight.shape)
@@ -147,7 +149,7 @@ try:
 except:
     pass
 
-folder = 'savefolder/control' if params.control else 'savefolder/'+run_name
+folder = 'savefolder/'+run_name
 try:
     os.mkdir(folder)
 except:

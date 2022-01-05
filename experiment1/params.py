@@ -17,7 +17,7 @@ parser.add_argument("--model_card", type=str, default="EleutherAI/gpt-j-6B", hel
 
 parser.add_argument("--device", type=str, default="cuda", help="name of the device to be used for training")
 
-parser.add_argument("--case_insensitive", dest="case_insensitive", action="store_true", help="Consider lowercase and uppercase separately.")
+parser.add_argument("--case_sensitive", dest="case_sensitive", action="store_true", help="Consider lowercase and uppercase separately.")
 
 parser.add_argument("--wandb", dest="wandb", action="store_true", default=False)
 

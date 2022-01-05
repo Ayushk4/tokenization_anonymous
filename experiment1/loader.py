@@ -11,7 +11,7 @@ np.random.seed(params.seed)
 random.seed(params.seed)
 torch.manual_seed(params.seed)
 
-do_lowercase = lambda x: x.lower() if not params.case_insensitive else x
+do_lowercase = lambda x: x.lower() if not params.case_sensitive else x
 MAX_LEN = 0
 
 basepath = "/".join(os.path.realpath(__file__).split('/')[:-1])
