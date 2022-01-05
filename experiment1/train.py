@@ -123,7 +123,7 @@ class SpellingModel(nn.Module):
             self.n_dims = trained_embeddings.shape[1]
         else:
             trained_embeddings = list(AutoModel.from_pretrained(params.model_card).named_parameters())[0]
-            assert trained_embeddings[0] == 'embeddings.word_embeddings.weight'
+            assert trained_embeddings[0] in ['embeddings.word_embeddings.weight', 'wte.weight']
             trained_embeddings[1].requires_grad = False
 
             self.frozen_embeddings = nn.Embedding.from_pretrained(trained_embeddings[1], freeze=True)
