@@ -16,7 +16,7 @@ MAX_LEN = 0
 
 basepath = "/".join(os.path.realpath(__file__).split('/')[:-1])
 
-if 'bert' not in params.model_card:
+if 'bert-' not in params.model_card:
     regex_pattern = r'Ġ?[a-zA-Z]+$'
 else:
     regex_pattern = r'#*[a-zA-Z]+$'
