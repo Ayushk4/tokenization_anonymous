@@ -24,8 +24,9 @@ from sklearn.metrics import confusion_matrix, classification_report
 
 import wandb
 
-run_name = "ctrl" if params.control else params.model_card.split("/")[-1]
-run_name += "." + str(params.lr) + "." + str(params.batch_size) + "." + str(params.seed)
+run_name = "ctl." if params.control else "prd."
+run_name += params.model_card.split("/")[-1]
+run_name += "." + str(params.lr) + "." + str(params.seed)
 if params.case_sensitive:
     run_name += '.case_sense'
 if not params.dummy_run and params.wandb:
