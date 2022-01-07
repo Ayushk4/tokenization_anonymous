@@ -112,7 +112,7 @@ if params.control:
 class SpellingModel(nn.Module):
     def __init__(self):
         super(SpellingModel, self).__init__()
-        if params.control or 'EleutherAI' in params.model_card:
+        if params.control or 'EleutherAI/gpt-j' in params.model_card:
             global trained_embeddings
             self.gptj_config = AutoConfig.from_pretrained('EleutherAI/gpt-j-6B')
             # assert self.gptj_config.vocab_size == trained_embeddings.shape[0], (self.gptj_config.vocab_size, trained_embeddings.shape)
