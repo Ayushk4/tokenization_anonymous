@@ -11,7 +11,7 @@ sec_4.1_*/pred
 sec_4.1_*/preds
 sec_4.1_*/savefolder
 */toks.json
-experiment1/savefolder
+exp*/savefolder
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
