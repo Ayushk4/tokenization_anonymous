@@ -30,3 +30,4 @@ nltk.download('wordnet')
 8. Run `parallel_merge_qtfy_filter.py` to merge these based on words.
 9. Run `parallel_qtfy_toks.py` so that for each word, the context is trimmed enough that makes difference to the tokenization but contains only the target word and quantifies it: `python3 parallel_qtfy_toks.py`.
 10. Run `python3 final_qtfy_tokenization.py` to remove pseudo matches and print the statistics.
+11. Run `python3 extra_final_statistics.py` for additional statistics.

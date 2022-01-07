@@ -46,6 +46,9 @@ def is1diff(string1, string2):
     return True
 
 def single_word_qtfy(word):
+    maps_tok_to_freq = [(tuple(tok.tokenize(single_string[0])), single_string[1])
+                         for single_string in occurences[word]]
+
     unique_toks = set([tuple(tok.tokenize(single_string[0]))
                         for single_string in occurences[word]])
 
@@ -132,7 +135,7 @@ def single_word_qtfy(word):
             [x for x in words_removed_1_dist_less_eq if x not in words_removed_0_dist and x not in words_removed_1_dist_less],
             '\n')
 
-    return {'all_unique_toks': list(unique_toks),
+    return [{'all_unique_toks': list(unique_toks),
             'words_exact_contain': list(words_exact_contain),
             'words_exact_case_insensitive': list(capitalization),
             '1_dist_words_in_wordnet': list(words_to_remove),
@@ -141,7 +144,7 @@ def single_word_qtfy(word):
             'unique_toks_without_1_dist_wordnet_words': list(removed_words),
             'unique_toks_less_eq_leven_dist_than_1_dist_wordnet_words': list(removed_within_1_dist_less),
             'unique_toks_less_leven_dist_than_1_dist_wordnet_words': list(removed_within_1_dist_less_eq),
-            }
+            }, maps_tok_to_freq]
 
 def print_statishtics(number_list, word_list):
     scale_occurrence_frequency = lambda x: min(16, max(12, round(log(x))))
@@ -235,13 +238,13 @@ def main():
 
     result = pool.map(single_word_qtfy, target_words)
     # print(result)
-    for x in result[0]:
+    for x in result[0][0]:
         print("=========", x, "=========")
-        print_statishtics([len(r[x]) for r in result], target_words)
+        print_statishtics([len(r[0][x]) for r in result], target_words)
         print("\n")
 
-    print([(x, sum([len(r[x]) for r in result])/len(result))
-            for x in result[0]])
+    print([(x, sum([len(r[0][x]) for r in result])/len(result))
+            for x in result[0][0]])
 
     json.dump({w: r for w, r in zip(target_words, result)},
             open("toks.json", 'w+'))
