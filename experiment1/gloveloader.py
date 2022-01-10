@@ -4,6 +4,7 @@ from params import params
 import numpy as np
 from transformers import AutoTokenizer
 from torch.utils import data
+import pandas as pd
 import re
 import string
 
@@ -11,21 +12,25 @@ np.random.seed(params.seed)
 random.seed(params.seed)
 torch.manual_seed(params.seed)
 
+glove_fraction = 0.1
+
 do_lowercase = lambda x: x.lower() if not params.case_sensitive else x
 MAX_LEN = 0
 
 basepath = "/".join(os.path.realpath(__file__).split('/')[:-1])
 
-if 'bert-' not in params.model_card:
-    regex_pattern = r'Ġ?[a-zA-Z]+$'
-else:
-    regex_pattern = r'#*[a-zA-Z]+$'
+regex_pattern = '^[a-zA-Z]+$'
 
-bert_tokenizer = AutoTokenizer.from_pretrained(params.model_card)
-full_dataset = sorted(bert_tokenizer.vocab.items(), key = lambda x: x[1])
+glove = pd.read_csv(params.model_card, sep=" ", quoting=3, header=None, index_col=0)
+
+full_dataset = sorted([(str(x), i) for i, x in enumerate(list(glove.T.keys()))], key = lambda x: x[1])
+token_to_index = {k:v for k,v in full_dataset}
+glove_size = int(len(full_dataset) * glove_fraction)
+print(glove_size)
+full_dataset = full_dataset[:glove_size]
 
 full_dataset = [x for x in full_dataset if re.match(regex_pattern, x[0]) and
-                len(x[0]) > 1 and set(x[0]) != {'Ġ'}]
+                len(x[0]) > 1 and set(x[0]) != {'Ġ'} and x[0].lower() not in ['nan', 'null', 'n/a']]
 
 char_vocab = list(set([x.lower() for d in full_dataset for x in d[0]]))
 print(char_vocab)
@@ -37,9 +42,9 @@ from nltk.stem import WordNetLemmatizer
 lemmatizer = WordNetLemmatizer()
 clean_up = lambda x: x[1:] if x[0] == 'Ġ' else x
 
-lemma_wise   = {x:[] for x in set(lemmatizer.lemmatize(clean_up(x[0])) for x in full_dataset)}
+lemma_wise = {x:[] for x in set(lemmatizer.lemmatize(clean_up(x[0].lower())) for x in full_dataset)}
 for x in full_dataset:
-    lemma_wise[lemmatizer.lemmatize(clean_up(x[0]))].append(x)
+    lemma_wise[lemmatizer.lemmatize(clean_up(x[0].lower()))].append(x)
 
 flatten = lambda x: [y for xx in x for y in xx]
 full_dataset = list(lemma_wise.values())
@@ -53,7 +58,7 @@ def shuffle_and_return(x):
 
 class SpellingDataset:
     def __init__(self):
-        self.bert_tokenizer = bert_tokenizer
+        self.glove_tokenizer = token_to_index
 
         self.char_to_id = char_to_id
         self.id_to_char = id_to_char
@@ -87,7 +92,7 @@ class SpellingDataset:
     def process(self, c, all_data):
         if params.dummy_run:
             all_data = all_data[:5]
-        return [(x[0], self.bert_tokenizer.convert_tokens_to_ids(x[0]),
+        return [(x[0], self.glove_tokenizer[x[0]],
                 int(c in do_lowercase(x[0])))
             for x in all_data]
 
@@ -106,7 +111,8 @@ if __name__ == "__main__":
     print({x[0]: len(x[1][0]) for x in dataset.alphabet_wise_datasets.items()})
     print('\n')
     print({x[0]: len(x[1][1]) for x in dataset.alphabet_wise_datasets.items()})
-
+    # print([(k,v) for k,v in dataset.glove_tokenizer.items() if v == 72924])
+    print(sorted([x[1] for x in dataset.alphabet_wise_datasets['a'][0]])[-10:])
     print(dataset.alphabet_wise_datasets['a'][0][:5])
     print(dataset.alphabet_wise_datasets['a'][1][:5])
 

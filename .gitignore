@@ -4,6 +4,7 @@ trained_weights
 *.pt
 *.pth
 */wandb
+glove.6B*.txt
 
 wandb
 sec_4.1_*/*.json
