@@ -24,7 +24,10 @@ from sklearn.metrics import confusion_matrix, classification_report
 
 import wandb
 
-run_name = "ctl." if params.control else "prd."
+if params.have_char_embeds:
+    run_name = "chr."
+else:
+    run_name = "ctl." if params.control else "prd."
 run_name += params.model_card.split("/")[-1]
 run_name += "." + str(params.lr) + "." + str(params.seed)
 if params.case_sensitive:
@@ -39,8 +42,11 @@ def train(model, dataset, criterion):
     num_batch = 0
 
     for i in range(len(dataset))[::params.batch_size]:
-        (batch_tokens, token_ids_tensor, char_label_tensor) = loader.pad(dataset[i:i+params.batch_size])
-        preds = model(token_ids_tensor)
+        (batch_tokens, token_ids_tensor, char_label_tensor, char_onehot_tensor) = loader.pad(dataset[i:i+params.batch_size])
+        if params.have_char_embeds:
+            preds = model(char_onehot_tensor)
+        else:
+            preds = model(token_ids_tensor)
         loss = criterion(torch.flatten(preds), torch.flatten(char_label_tensor))
 
         loss.backward()
@@ -64,8 +70,11 @@ def evaluate(model, dataset, criterion):
 
     with torch.no_grad():
         for i in range(len(dataset))[::params.batch_size]:
-            (batch_tokens, token_ids_tensor, char_label_tensor) = loader.pad(dataset[i:i+params.batch_size])
-            preds = model(token_ids_tensor)
+            (batch_tokens, token_ids_tensor, char_label_tensor, char_onehot_tensor) = loader.pad(dataset[i:i+params.batch_size])
+            if params.have_char_embeds:
+                preds = model(char_onehot_tensor)
+            else:
+                preds = model(token_ids_tensor)
             loss = criterion(torch.flatten(preds), torch.flatten(char_label_tensor))
 
             predicts.extend([int(x) for x in torch.flatten(preds > 0).tolist()])
@@ -105,14 +114,21 @@ os.system("nvidia-smi")
 
 ########## Create model #############
 
-trained_embeddings = torch.load("gpt-j-6B.Embedding.pth")
-if params.control:
-    trained_embeddings = torch.normal(0, 0.01, size=(100000, trained_embeddings.shape[1]))
+if not params.have_char_embeds:
+    trained_embeddings = torch.load("gpt-j-6B.Embedding.pth")
+    if params.control:
+        trained_embeddings = torch.normal(0, 0.01, size=(100000, trained_embeddings.shape[1]))
 
 class SpellingModel(nn.Module):
     def __init__(self):
         super(SpellingModel, self).__init__()
-        if params.control or 'EleutherAI/gpt-j' in params.model_card:
+        if params.have_char_embeds:
+            self.n_dims = 100
+            # Actually not frozen
+            self.frozen_embeddings = nn.Sequential(nn.ReLU(),
+                                    nn.Linear(52, self.n_dims)
+                                )
+        elif params.control or 'EleutherAI/gpt-j' in params.model_card:
             global trained_embeddings
             self.gptj_config = AutoConfig.from_pretrained('EleutherAI/gpt-j-6B')
             # assert self.gptj_config.vocab_size == trained_embeddings.shape[0], (self.gptj_config.vocab_size, trained_embeddings.shape)
@@ -247,8 +263,11 @@ for c in string.ascii_lowercase:
     test_dataset = dataset[c][1]
     with torch.no_grad():
         for i in range(len(test_dataset))[::params.batch_size]:
-            (batch_tokens, token_ids_tensor, char_label_tensor) = loader.pad(test_dataset[i:i+params.batch_size])
-            preds = model(token_ids_tensor)
+            (batch_tokens, token_ids_tensor, char_label_tensor, char_onehot_tensor) = loader.pad(test_dataset[i:i+params.batch_size])
+            if params.have_char_embeds:
+                preds = model(char_onehot_tensor)
+            else:
+                preds = model(token_ids_tensor)
             logits.extend(preds.tolist())
             predicts.extend([int(x) for x in torch.flatten(preds > 0).tolist()])
             gnd_truths.extend([int(x) for x in char_label_tensor.tolist()])

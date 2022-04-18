@@ -12,6 +12,7 @@ parser.add_argument("--n_epochs", type=int, default=5)
 
 parser.add_argument("--dummy_run", dest="dummy_run", action="store_true", help="To make the model run on only one training sample for debugging")
 parser.add_argument("--control", dest="control", action="store_true", help="Run Control")
+parser.add_argument("--have_char_embeds", dest="have_char_embeds", action="store_true", help="Run Upper limit with char embeds")
 
 parser.add_argument("--model_card", type=str, default="EleutherAI/gpt-j-6B", help="Model Card")
 

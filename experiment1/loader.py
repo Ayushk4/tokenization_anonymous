@@ -88,7 +88,8 @@ class SpellingDataset:
         if params.dummy_run:
             all_data = all_data[:5]
         return [(x[0], self.bert_tokenizer.convert_tokens_to_ids(x[0]),
-                int(c in do_lowercase(x[0])))
+                int(c in do_lowercase(x[0])),
+                [(c in x[0]) * 1.0 for c in string.ascii_lowercase + string.ascii_uppercase])
             for x in all_data]
 
 def pad(batch):
@@ -96,8 +97,9 @@ def pad(batch):
     batch_tokens = get_f(0)
     token_ids_tensor = torch.LongTensor(get_f(1)).to(params.device)
     char_ids_tensor = torch.FloatTensor(get_f(2)).to(params.device)
+    char_onehot_tensor = torch.FloatTensor(get_f(3)).to(params.device)
 
-    return batch_tokens, token_ids_tensor, char_ids_tensor
+    return batch_tokens, token_ids_tensor, char_ids_tensor, char_onehot_tensor
 
 if __name__ == "__main__":
     dataset = SpellingDataset()
