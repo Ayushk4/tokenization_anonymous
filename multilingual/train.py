@@ -109,7 +109,7 @@ os.system("nvidia-smi")
 
 # trained_embeddings = torch.load("gpt-j-6B.Embedding.pth")
 if params.control:
-    trained_embeddings = torch.normal(0, 0.01, size=(100000, trained_embeddings.shape[1]))
+    trained_embeddings = torch.normal(0, 0.01, size=(300000, 1024)
 
 class SpellingModel(nn.Module):
     def __init__(self):
