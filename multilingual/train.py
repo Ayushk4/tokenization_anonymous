@@ -27,6 +27,7 @@ import wandb
 from collections import Counter
 
 run_name = "ctl." if params.control else "prd."
+run_name = params.language[:4] + "." + run_name
 run_name += params.model_card.split("/")[-1]
 run_name += "." + str(params.lr) + "." + str(params.seed)
 if params.case_sensitive:
