@@ -18,7 +18,9 @@ MAX_LEN = 0
 
 basepath = "/".join(os.path.realpath(__file__).split('/')[:-1])
 
-permissible_chars = [chr(i) for i in range(PERMISSIBLE_CHAR_START_END[0], PERMISSIBLE_CHAR_START_END[1]+1)]
+permissible_chars = PERMISSIBLE_CHAR_START_END
+if type(PERMISSIBLE_CHAR_START_END) == tuple:
+    permissible_chars = [chr(i) for i in range(PERMISSIBLE_CHAR_START_END[0], PERMISSIBLE_CHAR_START_END[1]+1)]
 
 model_tokenizer = AutoTokenizer.from_pretrained(params.model_card)
 
